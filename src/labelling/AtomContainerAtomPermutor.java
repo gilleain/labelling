@@ -29,8 +29,8 @@ public class AtomContainerAtomPermutor extends Permutor
             int n = atomContainer.getAtomCount();
             for (int originalIndex = 0; originalIndex < n; originalIndex++) {
                 int newIndex = permutation[originalIndex];
-                IAtom atom = permutedContainer.getAtom(newIndex);
-                newOrder[originalIndex] = atom;
+                IAtom atom = permutedContainer.getAtom(originalIndex);
+                newOrder[newIndex] = atom;
             }
             permutedContainer.setAtoms(newOrder);
         } catch (CloneNotSupportedException cne) {

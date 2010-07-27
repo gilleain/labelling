@@ -18,7 +18,7 @@ public class CanonicalLabellingAdaptor implements ICanonicalLabeller {
             int x = ((Long) a.getProperty(InvPair.CANONICAL_LABEL)).intValue(); 
             perm[i] = x - 1;
         }
-        System.out.println(java.util.Arrays.toString(perm));
+//        System.out.println(java.util.Arrays.toString(perm));
         
         return AtomContainerAtomPermutor.permute(perm, container);
     }
