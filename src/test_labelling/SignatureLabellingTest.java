@@ -2,7 +2,7 @@ package test_labelling;
 
 import junit.framework.Assert;
 import labelling.AtomContainerPrinter;
-import labelling.CanonicalLabeller;
+import labelling.ICanonicalLabeller;
 import labelling.MoleculeSignatureLabellingAdaptor;
 
 import org.junit.Test;
@@ -28,7 +28,7 @@ public class SignatureLabellingTest {
        benzene.addBond(4, 5, Order.SINGLE);
        
        String original = AtomContainerPrinter.toString(benzene);
-       CanonicalLabeller labeller = new MoleculeSignatureLabellingAdaptor();
+       ICanonicalLabeller labeller = new MoleculeSignatureLabellingAdaptor();
        IAtomContainer permutedBenzene = labeller.getCanonicalMolecule(benzene);
        String permuted = AtomContainerPrinter.toString(permutedBenzene);
        Assert.assertEquals(original, permuted);

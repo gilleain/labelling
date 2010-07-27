@@ -35,6 +35,7 @@ public class AtomContainerAtomPermutor extends Permutor
             permutedContainer.setAtoms(newOrder);
         } catch (CloneNotSupportedException cne) {
             //?
+            System.out.println(cne);
         }
     
         return permutedContainer;

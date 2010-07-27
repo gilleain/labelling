@@ -25,7 +25,7 @@ public class AtomContainerPrinter {
             }
             
             bondsLeft--;
-            if (bondsLeft > 1) {
+            if (bondsLeft > 0) {
                 sb.append(",");
             }
         }
