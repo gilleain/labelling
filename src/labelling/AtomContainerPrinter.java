@@ -13,9 +13,11 @@ public class AtomContainerPrinter {
     private class Edge implements Comparable<Edge> {
         public int first;
         public int last;
-        public Edge(int first, int last) {
+        public int order;
+        public Edge(int first, int last, int order) {
             this.first = first;
             this.last = last;
+            this.order = order;
         }
         
         @Override
@@ -28,7 +30,7 @@ public class AtomContainerPrinter {
         }
         
         public String toString() {
-            return first + ":" + last;
+            return first + ":" + last + "(" + order + ")";
         }
     }
     
@@ -44,10 +46,11 @@ public class AtomContainerPrinter {
             IAtom a1 = bond.getAtom(1);
             int a0N = atomContainer.getAtomNumber(a0);
             int a1N = atomContainer.getAtomNumber(a1);
+            int o = bond.getOrder().ordinal();
             if (a0N < a1N) {
-                edges.add(new Edge(a0N, a1N));
+                edges.add(new Edge(a0N, a1N, o));
             } else {
-                edges.add(new Edge(a1N, a0N));
+                edges.add(new Edge(a1N, a0N, o));
             }
         }
         Collections.sort(edges);
