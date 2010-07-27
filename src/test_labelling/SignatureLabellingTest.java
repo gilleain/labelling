@@ -46,9 +46,9 @@ public class SignatureLabellingTest extends BaseLabellingTest {
         }
         // test requires that we know the particular canonical order!
         benzene.addBond(0, 1, Order.SINGLE);
-        benzene.addBond(0, 2, Order.SINGLE);
-        benzene.addBond(1, 3, Order.SINGLE);
-        benzene.addBond(2, 4, Order.SINGLE);
+        benzene.addBond(0, 4, Order.SINGLE);
+        benzene.addBond(1, 2, Order.SINGLE);
+        benzene.addBond(2, 3, Order.SINGLE);
         benzene.addBond(3, 5, Order.SINGLE);
         benzene.addBond(4, 5, Order.SINGLE);
         permuteTest(labeller, benzene);

@@ -1,5 +1,6 @@
 package test_labelling;
 
+import junit.framework.Assert;
 import labelling.AtomContainerAtomPermutor;
 import labelling.AtomContainerPrinter;
 import labelling.ICanonicalLabeller;
@@ -18,9 +19,10 @@ public class BaseLabellingTest {
         while (acap.hasNext()) {
             IAtomContainer permutation = acap.next();
             IAtomContainer canonical = labeller.getCanonicalMolecule(permutation);
-            String permutedString = printer.toString(permutation);
+//            String permutedString = printer.toString(permutation);
             String canonicalString = printer.toString(canonical);
-            System.out.println(canonicalString + " " + permutedString);
+//            System.out.println(canonicalString + " " + permutedString);
+            Assert.assertEquals(original, canonicalString);
         }
     }
 
