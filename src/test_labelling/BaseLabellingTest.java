@@ -26,7 +26,9 @@ public class BaseLabellingTest {
             String canonicalString = printer.toString(canonical);
             int[] p = labeller.getCanonicalPermutation(permutation);
             System.out.println(
-                   canonicalString + " " + permutedString + Arrays.toString(p));
+                   permutedString 
+                   + " -> " + Arrays.toString(p) + " -> "
+                   + canonicalString);
 //            Assert.assertEquals(original, canonicalString);
         }
     }
