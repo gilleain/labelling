@@ -53,6 +53,21 @@ public class CanonLabelerTest extends BaseLabellingTest {
     }
     
     @Test
+    public void permuteCycloCNOP() {
+        IAtomContainer cbd = new AtomContainer();
+        cbd.addAtom(new Atom("C"));
+        cbd.addAtom(new Atom("N"));
+        cbd.addAtom(new Atom("O"));
+        cbd.addAtom(new Atom("P"));
+        cbd.addBond(0, 1, Order.SINGLE);
+        cbd.addBond(0, 2, Order.SINGLE);
+        cbd.addBond(1, 3, Order.SINGLE);
+        cbd.addBond(2, 3, Order.SINGLE);
+
+        permuteTest(canonLabeler, cbd);
+    }
+    
+    @Test
     public void permuteCycloButaDiene() {
         IAtomContainer cbd = new AtomContainer();
         for (int i = 0; i < 4 ; i++) {
