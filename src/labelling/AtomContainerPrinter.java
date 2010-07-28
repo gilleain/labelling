@@ -56,7 +56,7 @@ public class AtomContainerPrinter {
             if (a0N < a1N) {
                 edges.add(new Edge(a0N, a1N, o, a0S, a1S));
             } else {
-                edges.add(new Edge(a1N, a0N, o, a0S, a1S));
+                edges.add(new Edge(a1N, a0N, o, a1S, a0S));
             }
         }
         Collections.sort(edges);
