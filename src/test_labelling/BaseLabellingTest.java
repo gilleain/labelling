@@ -1,5 +1,7 @@
 package test_labelling;
 
+import java.util.Arrays;
+
 import junit.framework.Assert;
 import labelling.AtomContainerAtomPermutor;
 import labelling.AtomContainerPrinter;
@@ -22,7 +24,9 @@ public class BaseLabellingTest {
             IAtomContainer canonical = labeller.getCanonicalMolecule(permutation);
             String permutedString = printer.toString(permutation);
             String canonicalString = printer.toString(canonical);
-            System.out.println(canonicalString + " " + permutedString);
+            int[] p = labeller.getCanonicalPermutation(permutation);
+            System.out.println(
+                   canonicalString + " " + permutedString + Arrays.toString(p));
 //            Assert.assertEquals(original, canonicalString);
         }
     }

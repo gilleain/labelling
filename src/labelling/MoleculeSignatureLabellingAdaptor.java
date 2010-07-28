@@ -7,9 +7,14 @@ public class MoleculeSignatureLabellingAdaptor implements ICanonicalLabeller {
 
     @Override
     public IAtomContainer getCanonicalMolecule(IAtomContainer container) {
+        return AtomContainerAtomPermutor.permute(
+                getCanonicalPermutation(container), container);
+    }
+
+    @Override
+    public int[] getCanonicalPermutation(IAtomContainer container) {
         MoleculeSignature molSig = new MoleculeSignature(container); 
-        int[] labelling = molSig.getCanonicalLabels();
-        return AtomContainerAtomPermutor.permute(labelling, container);
+        return molSig.getCanonicalLabels();
     }
 
 }

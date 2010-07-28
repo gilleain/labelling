@@ -6,9 +6,15 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.smiles.InvPair;
 
 public class CanonicalLabellingAdaptor implements ICanonicalLabeller {
-
+    
     @Override
     public IAtomContainer getCanonicalMolecule(IAtomContainer container) {
+        return AtomContainerAtomPermutor.permute(
+                getCanonicalPermutation(container), container);
+    }
+
+    @Override
+    public int[] getCanonicalPermutation(IAtomContainer container) {
         CanonicalLabeler labeler = new CanonicalLabeler();
         labeler.canonLabel(container);
         int n = container.getAtomCount();
@@ -18,9 +24,7 @@ public class CanonicalLabellingAdaptor implements ICanonicalLabeller {
             int x = ((Long) a.getProperty(InvPair.CANONICAL_LABEL)).intValue(); 
             perm[i] = x - 1;
         }
-//        System.out.println(java.util.Arrays.toString(perm));
-        
-        return AtomContainerAtomPermutor.permute(perm, container);
+        return perm;
     }
 
 }

@@ -11,13 +11,17 @@ import org.openscience.cdk.interfaces.IBond;
 public class AtomContainerPrinter {
     
     private class Edge implements Comparable<Edge> {
+        public String firstString;
+        public String lastString;
         public int first;
         public int last;
         public int order;
-        public Edge(int first, int last, int order) {
+        public Edge(int first, int last, int order, String firstString, String lastString) {
             this.first = first;
             this.last = last;
             this.order = order;
+            this.firstString = firstString;
+            this.lastString = lastString;
         }
         
         @Override
@@ -30,7 +34,7 @@ public class AtomContainerPrinter {
         }
         
         public String toString() {
-            return first + ":" + last + "(" + order + ")";
+            return firstString + first + ":" + lastString + last + "(" + order + ")";
         }
     }
     
@@ -46,11 +50,13 @@ public class AtomContainerPrinter {
             IAtom a1 = bond.getAtom(1);
             int a0N = atomContainer.getAtomNumber(a0);
             int a1N = atomContainer.getAtomNumber(a1);
+            String a0S = a0.getSymbol();
+            String a1S = a1.getSymbol();
             int o = bond.getOrder().ordinal();
             if (a0N < a1N) {
-                edges.add(new Edge(a0N, a1N, o));
+                edges.add(new Edge(a0N, a1N, o, a0S, a1S));
             } else {
-                edges.add(new Edge(a1N, a0N, o));
+                edges.add(new Edge(a1N, a0N, o, a0S, a1S));
             }
         }
         Collections.sort(edges);

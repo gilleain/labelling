@@ -22,6 +22,15 @@ public class AtomContainerAtomPermutor extends Permutor
     }
     
     public static IAtomContainer permute(int[] p, IAtomContainer atomContainer) {
+        boolean useA = false;
+        if (useA) {
+            return permuteA(p, atomContainer);
+        } else {
+            return permuteB(p, atomContainer);
+        }
+    }
+
+    private static IAtomContainer permuteA(int[] p, IAtomContainer atomContainer) {
         IAtomContainer permutedContainer = null;
         try {
             permutedContainer = 
@@ -49,7 +58,30 @@ public class AtomContainerAtomPermutor extends Permutor
     
         return permutedContainer;
     }
-
+    
+    private static IAtomContainer permuteB(int[] p, IAtomContainer atomContainer) {
+        IAtomContainer permutedContainer = null;
+        try {
+            permutedContainer = (IAtomContainer) atomContainer.clone();
+            int n = atomContainer.getAtomCount();
+            IAtom[] permutedAtoms = new IAtom[n];
+            for (int originalIndex = 0; originalIndex < n; originalIndex++) {
+                // get the newly cloned atom 
+                IAtom atom = permutedContainer.getAtom(originalIndex);
+                
+                // permute the index
+                int newIndex = p[originalIndex];
+                
+                // put the atom in the new place
+                permutedAtoms[newIndex] = atom;
+            }
+            permutedContainer.setAtoms(permutedAtoms);
+        } catch (CloneNotSupportedException cne) {
+            //?
+            System.out.println(cne);
+        }
+        return permutedContainer;
+    }
    
     @Override
     public void remove() {

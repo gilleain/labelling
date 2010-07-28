@@ -6,4 +6,5 @@ public interface ICanonicalLabeller {
     
     public IAtomContainer getCanonicalMolecule(IAtomContainer container);
 
+    public int[] getCanonicalPermutation(IAtomContainer container);
 }
