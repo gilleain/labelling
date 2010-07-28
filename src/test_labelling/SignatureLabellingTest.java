@@ -69,6 +69,21 @@ public class SignatureLabellingTest extends BaseLabellingTest {
     }
     
     @Test
+    public void permuteCycloCCCO() {
+        IAtomContainer cbd = new AtomContainer();
+        cbd.addAtom(new Atom("C"));
+        cbd.addAtom(new Atom("C"));
+        cbd.addAtom(new Atom("C"));
+        cbd.addAtom(new Atom("O"));
+        cbd.addBond(0, 1, Order.DOUBLE);
+        cbd.addBond(0, 2, Order.SINGLE);
+        cbd.addBond(1, 3, Order.SINGLE);
+        cbd.addBond(2, 3, Order.SINGLE);
+
+        permuteTest(labeller, cbd);
+    }
+    
+    @Test
     public void permuteDoublyBondedBenzene() {
         IAtomContainer benzene = new AtomContainer();
         for (int i = 0; i < 6 ; i++) {

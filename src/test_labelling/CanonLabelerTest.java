@@ -59,8 +59,8 @@ public class CanonLabelerTest extends BaseLabellingTest {
         cbd.addAtom(new Atom("C"));
         cbd.addAtom(new Atom("C"));
         cbd.addAtom(new Atom("O"));
-        cbd.addBond(0, 1, Order.SINGLE);
-        cbd.addBond(0, 2, Order.DOUBLE);
+        cbd.addBond(0, 1, Order.DOUBLE);
+        cbd.addBond(0, 2, Order.SINGLE);
         cbd.addBond(1, 3, Order.SINGLE);
         cbd.addBond(2, 3, Order.SINGLE);
 

@@ -14,11 +14,14 @@ public class BaseLabellingTest {
     public void permuteTest(
             ICanonicalLabeller labeller, IAtomContainer atomContainer) {
         AtomContainerPrinter printer = new AtomContainerPrinter();
-        String original = printer.toString(
+        String original = printer.toString(atomContainer);
+        String canonOriginal = printer.toString(
                 labeller.getCanonicalMolecule(atomContainer));
         AtomContainerAtomPermutor acap = new 
             AtomContainerAtomPermutor(atomContainer);
-        
+        System.out.println(original + " -> " 
+                + Arrays.toString(labeller.getCanonicalPermutation(atomContainer))
+                + " -> " + canonOriginal);
         while (acap.hasNext()) {
             IAtomContainer permutation = acap.next();
             IAtomContainer canonical = labeller.getCanonicalMolecule(permutation);
