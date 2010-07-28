@@ -59,6 +59,11 @@ public class CanonLabelerTest extends BaseLabellingTest {
         cbd.addAtom(new Atom("C"));
         cbd.addAtom(new Atom("C"));
         cbd.addAtom(new Atom("O"));
+        cbd.getAtom(0).setHydrogenCount(1);
+        cbd.getAtom(1).setHydrogenCount(1);
+        cbd.getAtom(2).setHydrogenCount(2);
+        cbd.getAtom(3).setHydrogenCount(0);
+        
         cbd.addBond(0, 1, Order.DOUBLE);
         cbd.addBond(0, 2, Order.SINGLE);
         cbd.addBond(1, 3, Order.SINGLE);
