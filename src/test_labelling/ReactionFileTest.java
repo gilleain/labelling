@@ -42,6 +42,48 @@ public class ReactionFileTest {
         return reactionSet.getReaction(0);
     }
     
+    /**
+     * Convert a reaction into a canonical form by canonizing each of the
+     * structures in the reaction in turn.
+     * 
+     * @param reaction
+     * @return
+     */
+    public IReaction canoniseReaction(IReaction reaction) {
+        IReaction canonReaction = new Reaction();
+        IMoleculeSet canonicalProducts = new MoleculeSet();
+        for (IAtomContainer product : reaction.getProducts().atomContainers()) {
+            IAtomContainer canonicalForm = 
+                labeller.getCanonicalMolecule(product);
+            for (IAtom a : canonicalForm.atoms()) { 
+                String v = (String) a.getProperty(CDKConstants.ATOM_ATOM_MAPPING);
+                if (v != null) {
+                    a.setProperty(CDKConstants.ATOM_ATOM_MAPPING, Integer.valueOf(v));
+                }
+            }
+            canonicalProducts.addMolecule(
+                    canonicalForm.getBuilder().newInstance(
+                            IMolecule.class, canonicalForm));
+        }
+        IMoleculeSet canonicalReactants = new MoleculeSet();
+        for (IAtomContainer reactant: reaction.getReactants().atomContainers()) {
+            IAtomContainer canonicalForm = 
+                labeller.getCanonicalMolecule(reactant);
+            for (IAtom a : canonicalForm.atoms()) {
+                String v = (String) a.getProperty(CDKConstants.ATOM_ATOM_MAPPING);
+                if (v != null) {
+                    a.setProperty(CDKConstants.ATOM_ATOM_MAPPING, Integer.valueOf(v));
+                }
+             }
+            canonicalReactants.addMolecule(
+                    canonicalForm.getBuilder().newInstance(
+                            IMolecule.class, canonicalForm));
+        }
+        canonReaction.setProducts(canonicalProducts);
+        canonReaction.setReactants(canonicalReactants);
+        return canonReaction;
+    }
+    
     public void testFile(String filename) throws
             FileNotFoundException, CDKException {
         IReaction reaction = getReaction(filename);
@@ -90,46 +132,12 @@ public class ReactionFileTest {
     
     public void writeCanonicalRxnFile(String filename) throws CDKException, IOException {
         IReaction reaction = getReaction(filename);
-        IReaction canonReaction = new Reaction();
-        IMoleculeSet canonicalProducts = new MoleculeSet();
-        for (IAtomContainer product : reaction.getProducts().atomContainers()) {
-            IAtomContainer canonicalForm = 
-                labeller.getCanonicalMolecule(product);
-            for (IAtom a : canonicalForm.atoms()) { 
-                String v = (String) a.getProperty(CDKConstants.ATOM_ATOM_MAPPING);
-                if (v != null) {
-                    a.setProperty(CDKConstants.ATOM_ATOM_MAPPING, Integer.valueOf(v));
-                }
-            }
-            canonicalProducts.addMolecule(
-                    canonicalForm.getBuilder().newInstance(
-                            IMolecule.class, canonicalForm));
-        }
-        IMoleculeSet canonicalReactants = new MoleculeSet();
-        for (IAtomContainer reactant: reaction.getReactants().atomContainers()) {
-            IAtomContainer canonicalForm = 
-                labeller.getCanonicalMolecule(reactant);
-            for (IAtom a : canonicalForm.atoms()) {
-                String v = (String) a.getProperty(CDKConstants.ATOM_ATOM_MAPPING);
-                if (v != null) {
-                    a.setProperty(CDKConstants.ATOM_ATOM_MAPPING, Integer.valueOf(v));
-                }
-             }
-            canonicalReactants.addMolecule(
-                    canonicalForm.getBuilder().newInstance(
-                            IMolecule.class, canonicalForm));
-        }
-        canonReaction.setProducts(canonicalProducts);
-        canonReaction.setReactants(canonicalReactants);
-//        reaction.setProducts(canonicalProducts);
-//        reaction.setProducts(canonicalReactants);
+        IReaction canonReaction = canoniseReaction(reaction);
         String file_root = filename.substring(0, filename.indexOf("."));
         String outfile = file_root + "canonical.rxn";
         FileWriter writer = new FileWriter(outfile); 
         MDLRXNWriter rxnWriter = new MDLRXNWriter(writer);
-//        MDLRXNWriter rxnWriter = new MDLRXNWriter(System.out);
         rxnWriter.write(canonReaction);
-//        rxnWriter.write(reaction);
         rxnWriter.close();
     }
     
