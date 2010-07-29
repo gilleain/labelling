@@ -5,7 +5,7 @@ import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.smiles.InvPair;
 
-public class CanonicalLabellingAdaptor implements ICanonicalLabeller {
+public class CanonicalLabellingAdaptor implements ICanonicalMoleculeLabeller {
     
     @Override
     public IAtomContainer getCanonicalMolecule(IAtomContainer container) {

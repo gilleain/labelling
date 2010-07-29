@@ -2,7 +2,7 @@ package test_labelling;
 
 import junit.framework.Assert;
 import labelling.AtomContainerPrinter;
-import labelling.ICanonicalLabeller;
+import labelling.ICanonicalMoleculeLabeller;
 import labelling.MoleculeSignatureLabellingAdaptor;
 
 import org.junit.Test;
@@ -13,7 +13,7 @@ import org.openscience.cdk.interfaces.IBond.Order;
 
 public class SignatureLabellingTest extends BaseLabellingTest {
     
-    private ICanonicalLabeller labeller = new MoleculeSignatureLabellingAdaptor();
+    private ICanonicalMoleculeLabeller labeller = new MoleculeSignatureLabellingAdaptor();
     
     @Test
     public void labellingTest() {
@@ -32,7 +32,7 @@ public class SignatureLabellingTest extends BaseLabellingTest {
        AtomContainerPrinter printer = new AtomContainerPrinter();
        
        String original = printer.toString(benzene);
-       ICanonicalLabeller labeller = new MoleculeSignatureLabellingAdaptor();
+       ICanonicalMoleculeLabeller labeller = new MoleculeSignatureLabellingAdaptor();
        IAtomContainer permutedBenzene = labeller.getCanonicalMolecule(benzene);
        String permuted = printer.toString(permutedBenzene);
        Assert.assertEquals(original, permuted);

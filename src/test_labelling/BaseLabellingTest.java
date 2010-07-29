@@ -5,14 +5,14 @@ import java.util.Arrays;
 import junit.framework.Assert;
 import labelling.AtomContainerAtomPermutor;
 import labelling.AtomContainerPrinter;
-import labelling.ICanonicalLabeller;
+import labelling.ICanonicalMoleculeLabeller;
 
 import org.openscience.cdk.interfaces.IAtomContainer;
 
 public class BaseLabellingTest {
     
     public void permuteTest(
-            ICanonicalLabeller labeller, IAtomContainer atomContainer) {
+            ICanonicalMoleculeLabeller labeller, IAtomContainer atomContainer) {
         AtomContainerPrinter printer = new AtomContainerPrinter();
         String original = printer.toString(atomContainer);
         String canonOriginal = printer.toString(

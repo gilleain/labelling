@@ -2,7 +2,7 @@ package labelling;
 
 import org.openscience.cdk.interfaces.IAtomContainer;
 
-public interface ICanonicalLabeller {
+public interface ICanonicalMoleculeLabeller {
     
     public IAtomContainer getCanonicalMolecule(IAtomContainer container);
 

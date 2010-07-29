@@ -3,7 +3,7 @@ package test_labelling;
 import junit.framework.Assert;
 import labelling.AtomContainerPrinter;
 import labelling.CanonicalLabellingAdaptor;
-import labelling.ICanonicalLabeller;
+import labelling.ICanonicalMoleculeLabeller;
 
 import org.junit.Test;
 import org.openscience.cdk.Atom;
@@ -13,7 +13,7 @@ import org.openscience.cdk.interfaces.IBond.Order;
 
 public class CanonLabelerTest extends BaseLabellingTest {
     
-    private ICanonicalLabeller canonLabeler = new CanonicalLabellingAdaptor();
+    private ICanonicalMoleculeLabeller canonLabeler = new CanonicalLabellingAdaptor();
     
     @Test
     public void test() {
@@ -31,7 +31,7 @@ public class CanonLabelerTest extends BaseLabellingTest {
         AtomContainerPrinter printer = new AtomContainerPrinter();
         
         String original = printer.toString(benzene);
-        ICanonicalLabeller labeller = new CanonicalLabellingAdaptor();
+        ICanonicalMoleculeLabeller labeller = new CanonicalLabellingAdaptor();
         IAtomContainer permutedBenzene = labeller.getCanonicalMolecule(benzene);
         String permuted = printer.toString(permutedBenzene);
         Assert.assertEquals(original, permuted);

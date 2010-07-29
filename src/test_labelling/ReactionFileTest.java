@@ -10,19 +10,15 @@ import java.util.List;
 import junit.framework.Assert;
 
 import labelling.AtomContainerPrinter;
-import labelling.ICanonicalLabeller;
+import labelling.ICanonicalMoleculeLabeller;
+import labelling.ICanonicalReactionLabeller;
 import labelling.MoleculeSignatureLabellingAdaptor;
+import labelling.SignatureReactionCanoniser;
 
 import org.junit.Test;
-import org.openscience.cdk.CDKConstants;
-import org.openscience.cdk.MoleculeSet;
-import org.openscience.cdk.Reaction;
 import org.openscience.cdk.ReactionSet;
 import org.openscience.cdk.exception.CDKException;
-import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.interfaces.IMolecule;
-import org.openscience.cdk.interfaces.IMoleculeSet;
 import org.openscience.cdk.interfaces.IReaction;
 import org.openscience.cdk.interfaces.IReactionSet;
 import org.openscience.cdk.io.MDLRXNReader;
@@ -32,7 +28,7 @@ import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
 
 public class ReactionFileTest {
     
-    private ICanonicalLabeller labeller = 
+    private ICanonicalMoleculeLabeller labeller = 
         new MoleculeSignatureLabellingAdaptor();
     
     public IReaction getReaction(String filename) throws
@@ -40,48 +36,6 @@ public class ReactionFileTest {
         MDLRXNReader reader = new MDLRXNReader(new FileReader(filename));
         IReactionSet reactionSet = (IReactionSet) reader.read(new ReactionSet());
         return reactionSet.getReaction(0);
-    }
-    
-    /**
-     * Convert a reaction into a canonical form by canonizing each of the
-     * structures in the reaction in turn.
-     * 
-     * @param reaction
-     * @return
-     */
-    public IReaction canoniseReaction(IReaction reaction) {
-        IReaction canonReaction = new Reaction();
-        IMoleculeSet canonicalProducts = new MoleculeSet();
-        for (IAtomContainer product : reaction.getProducts().atomContainers()) {
-            IAtomContainer canonicalForm = 
-                labeller.getCanonicalMolecule(product);
-            for (IAtom a : canonicalForm.atoms()) { 
-                String v = (String) a.getProperty(CDKConstants.ATOM_ATOM_MAPPING);
-                if (v != null) {
-                    a.setProperty(CDKConstants.ATOM_ATOM_MAPPING, Integer.valueOf(v));
-                }
-            }
-            canonicalProducts.addMolecule(
-                    canonicalForm.getBuilder().newInstance(
-                            IMolecule.class, canonicalForm));
-        }
-        IMoleculeSet canonicalReactants = new MoleculeSet();
-        for (IAtomContainer reactant: reaction.getReactants().atomContainers()) {
-            IAtomContainer canonicalForm = 
-                labeller.getCanonicalMolecule(reactant);
-            for (IAtom a : canonicalForm.atoms()) {
-                String v = (String) a.getProperty(CDKConstants.ATOM_ATOM_MAPPING);
-                if (v != null) {
-                    a.setProperty(CDKConstants.ATOM_ATOM_MAPPING, Integer.valueOf(v));
-                }
-             }
-            canonicalReactants.addMolecule(
-                    canonicalForm.getBuilder().newInstance(
-                            IMolecule.class, canonicalForm));
-        }
-        canonReaction.setProducts(canonicalProducts);
-        canonReaction.setReactants(canonicalReactants);
-        return canonReaction;
     }
     
     public void testFile(String filename) throws
@@ -132,7 +86,9 @@ public class ReactionFileTest {
     
     public void writeCanonicalRxnFile(String filename) throws CDKException, IOException {
         IReaction reaction = getReaction(filename);
-        IReaction canonReaction = canoniseReaction(reaction);
+        ICanonicalReactionLabeller reactionLabeller = 
+            new SignatureReactionCanoniser();
+        IReaction canonReaction = reactionLabeller.getCanonicalReaction(reaction);
         String file_root = filename.substring(0, filename.indexOf("."));
         String outfile = file_root + "canonical.rxn";
         FileWriter writer = new FileWriter(outfile); 

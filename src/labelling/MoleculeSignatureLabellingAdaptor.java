@@ -3,7 +3,7 @@ package labelling;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.signature.MoleculeSignature;
 
-public class MoleculeSignatureLabellingAdaptor implements ICanonicalLabeller {
+public class MoleculeSignatureLabellingAdaptor implements ICanonicalMoleculeLabeller {
 
     @Override
     public IAtomContainer getCanonicalMolecule(IAtomContainer container) {
