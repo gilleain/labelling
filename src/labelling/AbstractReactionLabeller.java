@@ -28,28 +28,32 @@ public class AbstractReactionLabeller {
     
     public IReaction labelReaction(
             IReaction reaction, ICanonicalMoleculeLabeller labeller) {
-        IReaction canonReaction = new Reaction();
-        IMoleculeSet canonicalProducts = new MoleculeSet();
-        for (IAtomContainer product : reaction.getProducts().atomContainers()) {
-            IAtomContainer canonicalForm = 
-                labeller.getCanonicalMolecule(product);
-            if (fixAtomMappingCastType) { fixAtomMapping(canonicalForm); }
-            canonicalProducts.addMolecule(
-                    canonicalForm.getBuilder().newInstance(
-                            IMolecule.class, canonicalForm));
+        try {
+            IReaction canonReaction = (IReaction) reaction.clone();
+            IMoleculeSet canonicalProducts = new MoleculeSet();
+            for (IAtomContainer product : reaction.getProducts().atomContainers()) {
+                IAtomContainer canonicalForm = 
+                    labeller.getCanonicalMolecule(product);
+                if (fixAtomMappingCastType) { fixAtomMapping(canonicalForm); }
+                canonicalProducts.addMolecule(
+                        canonicalForm.getBuilder().newInstance(
+                                IMolecule.class, canonicalForm));
+            }
+            IMoleculeSet canonicalReactants = new MoleculeSet();
+            for (IAtomContainer reactant: reaction.getReactants().atomContainers()) {
+                IAtomContainer canonicalForm = 
+                    labeller.getCanonicalMolecule(reactant);
+                if (fixAtomMappingCastType) { fixAtomMapping(canonicalForm); }
+                canonicalReactants.addMolecule(
+                        canonicalForm.getBuilder().newInstance(
+                                IMolecule.class, canonicalForm));
+            }
+            canonReaction.setProducts(canonicalProducts);
+            canonReaction.setReactants(canonicalReactants);
+            return canonReaction;
+        } catch (CloneNotSupportedException cns) {
+            return null;
         }
-        IMoleculeSet canonicalReactants = new MoleculeSet();
-        for (IAtomContainer reactant: reaction.getReactants().atomContainers()) {
-            IAtomContainer canonicalForm = 
-                labeller.getCanonicalMolecule(reactant);
-            if (fixAtomMappingCastType) { fixAtomMapping(canonicalForm); }
-            canonicalReactants.addMolecule(
-                    canonicalForm.getBuilder().newInstance(
-                            IMolecule.class, canonicalForm));
-        }
-        canonReaction.setProducts(canonicalProducts);
-        canonReaction.setReactants(canonicalReactants);
-        return canonReaction; 
     }
 
 }
