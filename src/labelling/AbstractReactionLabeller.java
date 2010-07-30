@@ -11,6 +11,21 @@ import org.openscience.cdk.interfaces.IReaction;
 
 public class AbstractReactionLabeller {
     
+    /**
+     * A nasty hack necessary to get around a bug in the CDK
+     */
+    private boolean fixAtomMappingCastType = false;
+    
+    private void fixAtomMapping(IAtomContainer canonicalForm) {
+        for (IAtom a : canonicalForm.atoms()) { 
+            String v = (String) a.getProperty(CDKConstants.ATOM_ATOM_MAPPING);
+            if (v != null) {
+                a.setProperty(
+                        CDKConstants.ATOM_ATOM_MAPPING, Integer.valueOf(v));
+            }
+        }
+    }
+    
     public IReaction labelReaction(
             IReaction reaction, ICanonicalMoleculeLabeller labeller) {
         IReaction canonReaction = new Reaction();
@@ -18,13 +33,7 @@ public class AbstractReactionLabeller {
         for (IAtomContainer product : reaction.getProducts().atomContainers()) {
             IAtomContainer canonicalForm = 
                 labeller.getCanonicalMolecule(product);
-            for (IAtom a : canonicalForm.atoms()) { 
-                String v = (String) a.getProperty(CDKConstants.ATOM_ATOM_MAPPING);
-                if (v != null) {
-                    a.setProperty(
-                            CDKConstants.ATOM_ATOM_MAPPING, Integer.valueOf(v));
-                }
-            }
+            if (fixAtomMappingCastType) { fixAtomMapping(canonicalForm); }
             canonicalProducts.addMolecule(
                     canonicalForm.getBuilder().newInstance(
                             IMolecule.class, canonicalForm));
@@ -33,13 +42,7 @@ public class AbstractReactionLabeller {
         for (IAtomContainer reactant: reaction.getReactants().atomContainers()) {
             IAtomContainer canonicalForm = 
                 labeller.getCanonicalMolecule(reactant);
-            for (IAtom a : canonicalForm.atoms()) {
-                String v = (String) a.getProperty(CDKConstants.ATOM_ATOM_MAPPING);
-                if (v != null) {
-                    a.setProperty(
-                            CDKConstants.ATOM_ATOM_MAPPING, Integer.valueOf(v));
-                }
-             }
+            if (fixAtomMappingCastType) { fixAtomMapping(canonicalForm); }
             canonicalReactants.addMolecule(
                     canonicalForm.getBuilder().newInstance(
                             IMolecule.class, canonicalForm));

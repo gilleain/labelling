@@ -1,7 +1,6 @@
 package test_labelling;
 
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -16,12 +15,9 @@ import labelling.MoleculeSignatureLabellingAdaptor;
 import labelling.SignatureReactionCanoniser;
 
 import org.junit.Test;
-import org.openscience.cdk.ReactionSet;
 import org.openscience.cdk.exception.CDKException;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IReaction;
-import org.openscience.cdk.interfaces.IReactionSet;
-import org.openscience.cdk.io.MDLRXNReader;
 import org.openscience.cdk.io.MDLRXNWriter;
 import org.openscience.cdk.smiles.SmilesGenerator;
 import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
@@ -31,16 +27,11 @@ public class ReactionFileTest {
     private ICanonicalMoleculeLabeller labeller = 
         new MoleculeSignatureLabellingAdaptor();
     
-    public IReaction getReaction(String filename) throws
-    FileNotFoundException, CDKException {
-        MDLRXNReader reader = new MDLRXNReader(new FileReader(filename));
-        IReactionSet reactionSet = (IReactionSet) reader.read(new ReactionSet());
-        return reactionSet.getReaction(0);
-    }
+    
     
     public void testFile(String filename) throws
             FileNotFoundException, CDKException {
-        IReaction reaction = getReaction(filename);
+        IReaction reaction = ReactionTestUtility.getReaction(filename);
         List<IAtomContainer> containers = new ArrayList<IAtomContainer>(); 
         
         System.out.println("reaction");
@@ -85,7 +76,7 @@ public class ReactionFileTest {
     }
     
     public void writeCanonicalRxnFile(String filename) throws CDKException, IOException {
-        IReaction reaction = getReaction(filename);
+        IReaction reaction = ReactionTestUtility.getReaction(filename);
         ICanonicalReactionLabeller reactionLabeller = 
             new SignatureReactionCanoniser();
         IReaction canonReaction = reactionLabeller.getCanonicalReaction(reaction);
