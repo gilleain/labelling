@@ -2,6 +2,7 @@ package test_labelling;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,11 +17,18 @@ import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IMapping;
 import org.openscience.cdk.interfaces.IReaction;
 import org.openscience.cdk.interfaces.IReactionSet;
+import org.openscience.cdk.io.MDLRXNWriter;
 import org.openscience.cdk.tools.manipulator.ReactionManipulator;
 
 public class ReactionTestUtility {
     
     private static boolean useCDK = false;
+    
+    public static void printReactionToStdout(IReaction reaction) throws CDKException, IOException {
+        MDLRXNWriter rxnWriter = new MDLRXNWriter(System.out);
+        rxnWriter.write(reaction);
+        rxnWriter.close();
+    }
     
     public static IReaction getReaction(String filename) throws
         FileNotFoundException, CDKException {
