@@ -82,7 +82,7 @@ public class SignatureReactionCanoniserTest {
     public void testCustomReaction() throws Exception {
         IMolecule cycloButaneA = new Molecule();
         cycloButaneA.addAtom(new Atom("C"));
-        cycloButaneA.addAtom(new Atom("C"));
+        cycloButaneA.addAtom(new Atom("O"));
         cycloButaneA.addAtom(new Atom("C"));
         cycloButaneA.addAtom(new Atom("C"));
         cycloButaneA.addBond(0, 1, Order.SINGLE);
@@ -92,8 +92,8 @@ public class SignatureReactionCanoniserTest {
         
         IMolecule cycloButaneB = new Molecule();
         cycloButaneB.addAtom(new Atom("C"));
-        cycloButaneB.addAtom(new Atom("C"));
-        cycloButaneB.addAtom(new Atom("C"));
+        cycloButaneB.addAtom(new Atom("O"));
+        cycloButaneB.addAtom(new Atom("O"));
         cycloButaneB.addAtom(new Atom("C"));
         cycloButaneB.addBond(0, 2, Order.SINGLE);
         cycloButaneB.addBond(0, 3, Order.SINGLE);
@@ -102,14 +102,15 @@ public class SignatureReactionCanoniserTest {
         
         IMolecule fusedAB = new Molecule();
         fusedAB.addAtom(new Atom("C"));
-        fusedAB.addAtom(new Atom("C"));
+        fusedAB.addAtom(new Atom("O"));
         fusedAB.addAtom(new Atom("C"));
         fusedAB.addAtom(new Atom("C"));
         
         fusedAB.addAtom(new Atom("C"));
+        fusedAB.addAtom(new Atom("O"));
+        fusedAB.addAtom(new Atom("O"));
         fusedAB.addAtom(new Atom("C"));
-        fusedAB.addAtom(new Atom("C"));
-        fusedAB.addAtom(new Atom("C"));
+        
         fusedAB.addBond(0, 1, Order.SINGLE);
         fusedAB.addBond(0, 2, Order.SINGLE);
         fusedAB.addBond(1, 3, Order.SINGLE);

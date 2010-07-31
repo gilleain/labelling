@@ -83,7 +83,9 @@ public class ReactionFileTest {
         String file_root = filename.substring(0, filename.indexOf("."));
         String outfile = file_root + "canonical.rxn";
         FileWriter writer = new FileWriter(outfile); 
-        MDLRXNWriter rxnWriter = new MDLRXNWriter(writer);
+//        MDLRXNWriter rxnWriter = new MDLRXNWriter(writer);
+//        rxnWriter.write(canonReaction);
+        MDLRXNWriter rxnWriter = new MDLRXNWriter(System.out);
         rxnWriter.write(canonReaction);
         rxnWriter.close();
     }
