@@ -63,7 +63,7 @@ public class AbstractReactionLabeller {
         for (int f = 0; f < reaction.getMappingCount(); f++) {
             IMapping mapping = reaction.getMapping(f);
             IChemObject keyChemObj0 = mapping.getChemObject(0);
-            IChemObject keyChemObj1 = mapping.getChemObject(0);
+            IChemObject keyChemObj1 = mapping.getChemObject(1);
             ChemObject co0 = (ChemObject)atomatom.get(keyChemObj0);
             ChemObject co1 = (ChemObject)atomatom.get(keyChemObj1);
             map[f] = new Mapping(co0, co1);
@@ -75,15 +75,42 @@ public class AbstractReactionLabeller {
     private Map<IAtom, IAtom> atomAtomMap(IReaction reaction, IReaction clone) {
      // create a Map of corresponding atoms for molecules (key: original Atom, 
         // value: clone Atom)
-        Map<IAtom, IAtom> atomatom = new Hashtable<IAtom, IAtom>();
-        for (int i = 0; i < reaction.getReactants().getMoleculeCount(); ++i) {
-            IMolecule mol = reaction.getReactants().getMolecule(i);
-            IMolecule mol2 = clone.getReactants().getMolecule(i);
+        Map<IAtom, IAtom> atomAtom = new Hashtable<IAtom, IAtom>();
+        IMoleculeSet reactants = reaction.getReactants();
+        IMoleculeSet clonedReactants = clone.getReactants();
+        for (int i = 0; i < reactants.getMoleculeCount(); ++i) {
+            IMolecule mol = reactants.getMolecule(i);
+            IMolecule mol2 = clonedReactants.getMolecule(i);
             for (int j = 0; j < mol.getAtomCount(); ++j) {
-                atomatom.put(mol.getAtom(j), mol2.getAtom(j));
+                atomAtom.put(mol.getAtom(j), mol2.getAtom(j));
             }
         }
-        return atomatom;
+        IMoleculeSet products = reaction.getProducts();
+        IMoleculeSet clonedProducts = clone.getProducts();
+        for (int i = 0; i < products.getMoleculeCount(); ++i) {
+            IMolecule mol = products.getMolecule(i);
+            IMolecule mol2 = clonedProducts.getMolecule(i);
+            for (int j = 0; j < mol.getAtomCount(); ++j) {
+                atomAtom.put(mol.getAtom(j), mol2.getAtom(j));
+            }
+        }
+        
+        return atomAtom;
+    }
+    
+    private List<IMapping> cloneMappings(IReaction reaction, Map<IAtom, IAtom> atomAtomMap) {
+        // clone the mappings
+        int numberOfMappings = reaction.getMappingCount();
+        List<IMapping> map = new ArrayList<IMapping>();
+        for (int mappingIndex = 0; mappingIndex < numberOfMappings; mappingIndex++) {
+            IMapping mapping = reaction.getMapping(mappingIndex);
+            IChemObject keyChemObj0 = mapping.getChemObject(0);
+            IChemObject keyChemObj1 = mapping.getChemObject(1);
+            IChemObject co0 = (IChemObject) atomAtomMap.get(keyChemObj0);
+            IChemObject co1 = (IChemObject) atomAtomMap.get(keyChemObj1);
+            map.add(new Mapping(co0, co1));
+        }
+        return map;
     }
     
     /**
@@ -106,19 +133,9 @@ public class AbstractReactionLabeller {
                 globalIndex++;
             }
         }
-        Map<IAtom, IAtom> atomatom = atomAtomMap(reaction, copyOfReaction);
         
-        // clone the mappings
-        int numberOfMappings = reaction.getMappingCount();
-        List<IMapping> map = new ArrayList<IMapping>();
-        for (int mappingIndex = 0; mappingIndex < numberOfMappings; mappingIndex++) {
-            IMapping mapping = reaction.getMapping(mappingIndex);
-            IChemObject keyChemObj0 = mapping.getChemObject(0);
-            IChemObject keyChemObj1 = mapping.getChemObject(0);
-            IChemObject co0 = (IChemObject)atomatom.get(keyChemObj0);
-            IChemObject co1 = (IChemObject)atomatom.get(keyChemObj1);
-            map.add(new Mapping(co0, co1));
-        }
+        Map<IAtom, IAtom> atomAtomMap = atomAtomMap(reaction, copyOfReaction);
+        List<IMapping> map = cloneMappings(reaction, atomAtomMap);
         
         Comparator<IMapping> mappingSorter = new Comparator<IMapping>() {
 
@@ -131,8 +148,14 @@ public class AbstractReactionLabeller {
             
         };
         Collections.sort(map, mappingSorter);
+        int mappingIndex = 0;
         for (IMapping mapping : map) {
+            mapping.getChemObject(0).setProperty(
+                    CDKConstants.ATOM_ATOM_MAPPING, mappingIndex);
+            mapping.getChemObject(1).setProperty(
+                    CDKConstants.ATOM_ATOM_MAPPING, mappingIndex);
             copyOfReaction.addMapping(mapping);
+            mappingIndex++;
         }
         
     }
