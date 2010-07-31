@@ -9,9 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.openscience.cdk.CDKConstants;
-import org.openscience.cdk.ChemObject;
 import org.openscience.cdk.Mapping;
-import org.openscience.cdk.Molecule;
 import org.openscience.cdk.MoleculeSet;
 import org.openscience.cdk.Reaction;
 import org.openscience.cdk.interfaces.IAtom;
@@ -40,49 +38,20 @@ public class AbstractReactionLabeller {
         }
     }
     
-    private IReaction cloneReactionWithoutMappings(
-            IReaction reaction) throws CloneNotSupportedException {
-        Reaction clone = new Reaction();
-        // clone the reactants, products and agents
-        clone.setReactants((MoleculeSet)((MoleculeSet)reaction.getReactants()).clone());
-//        clone.setAgents((MoleculeSet)((MoleculeSet)reaction.getAgents()).clone());
-        clone.setProducts((MoleculeSet)((MoleculeSet)reaction.getProducts()).clone());
-        
-        return clone;
-    }
-    
-    private IReaction cloneReaction(IReaction reaction) throws CloneNotSupportedException {
-        System.out.println("about to clone");
-        IReaction clone = cloneReactionWithoutMappings(reaction);
-        Map<IAtom, IAtom> atomatom = atomAtomMap(reaction, clone);
-        
-        // clone the maps - in the original code this gives mappings with
-        // a null second chemobject; no idea why. Interfaces?
-        int m = reaction.getMappingCount();
-        IMapping[] map = new Mapping[m];
-        for (int f = 0; f < reaction.getMappingCount(); f++) {
-            IMapping mapping = reaction.getMapping(f);
-            IChemObject keyChemObj0 = mapping.getChemObject(0);
-            IChemObject keyChemObj1 = mapping.getChemObject(1);
-            ChemObject co0 = (ChemObject)atomatom.get(keyChemObj0);
-            ChemObject co1 = (ChemObject)atomatom.get(keyChemObj1);
-            map[f] = new Mapping(co0, co1);
-        }
-        for (IMapping mapping : map) { clone.addMapping(mapping); }
-        return clone;
-    }
-    
-    private Map<IAtom, IAtom> atomAtomMap(IReaction reaction, IReaction clone) {
-     // create a Map of corresponding atoms for molecules (key: original Atom, 
-        // value: clone Atom)
+    private Map<IAtom, IAtom> atomAtomMap(
+            IReaction reaction, IReaction clone, 
+            Map<IMolecule, int[]> permutationMap) {
+     // create a Map of corresponding atoms for molecules 
+     // (key: original Atom, value: clone Atom)
         Map<IAtom, IAtom> atomAtom = new Hashtable<IAtom, IAtom>();
         IMoleculeSet reactants = reaction.getReactants();
         IMoleculeSet clonedReactants = clone.getReactants();
         for (int i = 0; i < reactants.getMoleculeCount(); ++i) {
             IMolecule mol = reactants.getMolecule(i);
             IMolecule mol2 = clonedReactants.getMolecule(i);
+            int[] permutation = permutationMap.get(mol2);
             for (int j = 0; j < mol.getAtomCount(); ++j) {
-                atomAtom.put(mol.getAtom(j), mol2.getAtom(j));
+                atomAtom.put(mol.getAtom(j), mol2.getAtom(permutation[j]));
             }
         }
         IMoleculeSet products = reaction.getProducts();
@@ -90,15 +59,30 @@ public class AbstractReactionLabeller {
         for (int i = 0; i < products.getMoleculeCount(); ++i) {
             IMolecule mol = products.getMolecule(i);
             IMolecule mol2 = clonedProducts.getMolecule(i);
+            int[] permutation = permutationMap.get(mol2);
             for (int j = 0; j < mol.getAtomCount(); ++j) {
-                atomAtom.put(mol.getAtom(j), mol2.getAtom(j));
+                atomAtom.put(mol.getAtom(j), mol2.getAtom(permutation[j]));
             }
+        }
+        
+        for (IAtom key : atomAtom.keySet()) {
+            IAtomContainer keyAC = 
+                ReactionManipulator.getRelevantAtomContainer(reaction, key);
+            int keyIndex = keyAC.getAtomNumber(key);
+            IAtom value = atomAtom.get(key);
+            IAtomContainer valueAC = 
+                ReactionManipulator.getRelevantAtomContainer(clone, value);
+            int valueIndex = valueAC.getAtomNumber(value);
+            System.out.println(
+                    "key " + keyIndex + key.getSymbol() 
+                    + " mapped to " + valueIndex + value.getSymbol());
         }
         
         return atomAtom;
     }
     
-    private List<IMapping> cloneMappings(IReaction reaction, Map<IAtom, IAtom> atomAtomMap) {
+    private List<IMapping> cloneMappings(
+            IReaction reaction, Map<IAtom, IAtom> atomAtomMap) {
         // clone the mappings
         int numberOfMappings = reaction.getMappingCount();
         List<IMapping> map = new ArrayList<IMapping>();
@@ -119,7 +103,9 @@ public class AbstractReactionLabeller {
      * 
      * @param reaction
      */
-    private void cloneAndSortMappings(IReaction reaction, IReaction copyOfReaction) {
+    private void cloneAndSortMappings(
+            IReaction reaction, IReaction copyOfReaction, 
+            Map<IMolecule, int[]> permutationMap) {
         
         // make a lookup for the indices of the atoms in the copy
         final Map<IChemObject, Integer> indexMap = 
@@ -134,7 +120,8 @@ public class AbstractReactionLabeller {
             }
         }
         
-        Map<IAtom, IAtom> atomAtomMap = atomAtomMap(reaction, copyOfReaction);
+        Map<IAtom, IAtom> atomAtomMap = atomAtomMap(
+                reaction, copyOfReaction, permutationMap);
         List<IMapping> map = cloneMappings(reaction, atomAtomMap);
         
         Comparator<IMapping> mappingSorter = new Comparator<IMapping>() {
@@ -164,27 +151,34 @@ public class AbstractReactionLabeller {
             IReaction reaction, ICanonicalMoleculeLabeller labeller) {
         System.out.println("labelling");
         IReaction canonReaction = new Reaction();
+        
+        Map<IMolecule, int[]> permutationMap = new HashMap<IMolecule, int[]>();
+        
         IMoleculeSet canonicalProducts = new MoleculeSet();
         for (IAtomContainer product : reaction.getProducts().atomContainers()) {
             IAtomContainer canonicalForm = 
                 labeller.getCanonicalMolecule(product);
             if (fixAtomMappingCastType) { fixAtomMapping(canonicalForm); }
-            canonicalProducts.addMolecule(
-                    canonicalForm.getBuilder().newInstance(
-                            IMolecule.class, canonicalForm));
+            IMolecule canonicalMolecule = 
+                canonicalForm.getBuilder().newInstance(IMolecule.class, canonicalForm); 
+            permutationMap.put(
+                    canonicalMolecule, labeller.getCanonicalPermutation(product));
+            canonicalProducts.addMolecule(canonicalMolecule);
         }
         IMoleculeSet canonicalReactants = new MoleculeSet();
         for (IAtomContainer reactant: reaction.getReactants().atomContainers()) {
             IAtomContainer canonicalForm = 
                 labeller.getCanonicalMolecule(reactant);
             if (fixAtomMappingCastType) { fixAtomMapping(canonicalForm); }
-            canonicalReactants.addMolecule(
-                    canonicalForm.getBuilder().newInstance(
-                            IMolecule.class, canonicalForm));
+            IMolecule canonicalMolecule = 
+                canonicalForm.getBuilder().newInstance(IMolecule.class, canonicalForm); 
+            permutationMap.put(
+                    canonicalMolecule, labeller.getCanonicalPermutation(reactant));
+            canonicalReactants.addMolecule(canonicalMolecule);
         }
         canonReaction.setProducts(canonicalProducts);
         canonReaction.setReactants(canonicalReactants);
-        cloneAndSortMappings(reaction, canonReaction);
+        cloneAndSortMappings(reaction, canonReaction, permutationMap);
         return canonReaction;
     }
 

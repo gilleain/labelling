@@ -80,12 +80,13 @@ public class ReactionFileTest {
         ICanonicalReactionLabeller reactionLabeller = 
             new SignatureReactionCanoniser();
         IReaction canonReaction = reactionLabeller.getCanonicalReaction(reaction);
+        
+//        ReactionTestUtility.printReactionToStdout(reaction);
+        
         String file_root = filename.substring(0, filename.indexOf("."));
         String outfile = file_root + "canonical.rxn";
         FileWriter writer = new FileWriter(outfile); 
-//        MDLRXNWriter rxnWriter = new MDLRXNWriter(writer);
-//        rxnWriter.write(canonReaction);
-        MDLRXNWriter rxnWriter = new MDLRXNWriter(System.out);
+        MDLRXNWriter rxnWriter = new MDLRXNWriter(writer);
         rxnWriter.write(canonReaction);
         rxnWriter.close();
     }
@@ -106,6 +107,7 @@ public class ReactionFileTest {
     public void testRxnFileC() throws CDKException, IOException {
         String filename = "data/TestPOX.rxn";
 //        testFile(filename);
+        
         writeCanonicalRxnFile(filename);
     }
 
