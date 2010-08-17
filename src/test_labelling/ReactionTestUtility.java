@@ -22,7 +22,6 @@ import org.openscience.cdk.tools.manipulator.ReactionManipulator;
 
 public class ReactionTestUtility {
     
-    private static boolean useCDK = false;
     
     public static void printReactionToStdout(IReaction reaction) throws CDKException, IOException {
         MDLRXNWriter rxnWriter = new MDLRXNWriter(System.out);
@@ -30,7 +29,7 @@ public class ReactionTestUtility {
         rxnWriter.close();
     }
     
-    public static IReaction getReaction(String filename) throws
+    public static IReaction getReaction(String filename, boolean useCDK) throws
         FileNotFoundException, CDKException {
         if (useCDK) {
             return useCDK(filename);

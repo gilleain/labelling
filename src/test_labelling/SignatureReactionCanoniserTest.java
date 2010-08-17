@@ -41,7 +41,7 @@ public class SignatureReactionCanoniserTest {
     }
     
     public void testMappingPermutation(String filename) throws FileNotFoundException, CDKException {
-        IReaction reaction = ReactionTestUtility.getReaction(filename);
+        IReaction reaction = ReactionTestUtility.getReaction(filename, false);
         testMappingPermutation(reaction);
     }
     

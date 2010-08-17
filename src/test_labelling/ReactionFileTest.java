@@ -18,22 +18,22 @@ import labelling.SignatureReactionCanoniser;
 
 import org.junit.Test;
 import org.openscience.cdk.exception.CDKException;
+import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IAtomContainer;
 import org.openscience.cdk.interfaces.IReaction;
 import org.openscience.cdk.io.MDLRXNWriter;
 import org.openscience.cdk.smiles.SmilesGenerator;
 import org.openscience.cdk.tools.manipulator.AtomContainerManipulator;
+import org.openscience.cdk.tools.manipulator.ReactionManipulator;
 
 public class ReactionFileTest {
     
     private ICanonicalMoleculeLabeller labeller = 
         new MoleculeSignatureLabellingAdaptor();
     
-    
-    
     public void testFile(String filename) throws
             FileNotFoundException, CDKException {
-        IReaction reaction = ReactionTestUtility.getReaction(filename);
+        IReaction reaction = ReactionTestUtility.getReaction(filename, false);
         List<IAtomContainer> containers = new ArrayList<IAtomContainer>(); 
         
         System.out.println("reaction");
@@ -80,7 +80,8 @@ public class ReactionFileTest {
     public void writeCanonicalRxnFile(
             String filename, String outPrefix, ICanonicalReactionLabeller reactionLabeller) 
     throws CDKException, IOException {
-        IReaction reaction = ReactionTestUtility.getReaction(filename);
+        IReaction reaction = ReactionTestUtility.getReaction(filename,false);
+        checkCharge(reaction);
         IReaction canonReaction = reactionLabeller.getCanonicalReaction(reaction);
         
 //        ReactionTestUtility.printReactionToStdout(reaction);
@@ -93,6 +94,21 @@ public class ReactionFileTest {
         MDLRXNWriter rxnWriter = new MDLRXNWriter(writer);
         rxnWriter.write(canonReaction);
         rxnWriter.close();
+    }
+    
+    public void checkCharge(IReaction reaction) {
+        int index = 0;
+        for (IAtomContainer ac : 
+            ReactionManipulator.getAllAtomContainers(reaction)) {
+            for (IAtom atom : ac.atoms()) {
+//                Double charge = atom.getCharge();
+                Integer charge = atom.getFormalCharge();
+                if (charge != null) {
+                    System.out.println("Atom " + index + " has charge " + charge);
+                }
+                index++;
+            }
+        }
     }
     
     @Test
