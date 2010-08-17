@@ -1,5 +1,6 @@
 package test_labelling;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -9,6 +10,7 @@ import java.util.List;
 import junit.framework.Assert;
 
 import labelling.AtomContainerPrinter;
+import labelling.ChargedSignatureReactionCanoniser;
 import labelling.ICanonicalMoleculeLabeller;
 import labelling.ICanonicalReactionLabeller;
 import labelling.MoleculeSignatureLabellingAdaptor;
@@ -75,16 +77,18 @@ public class ReactionFileTest {
         }
     }
     
-    public void writeCanonicalRxnFile(String filename) throws CDKException, IOException {
+    public void writeCanonicalRxnFile(
+            String filename, String outPrefix, ICanonicalReactionLabeller reactionLabeller) 
+    throws CDKException, IOException {
         IReaction reaction = ReactionTestUtility.getReaction(filename);
-        ICanonicalReactionLabeller reactionLabeller = 
-            new SignatureReactionCanoniser();
         IReaction canonReaction = reactionLabeller.getCanonicalReaction(reaction);
         
 //        ReactionTestUtility.printReactionToStdout(reaction);
         
         String file_root = filename.substring(0, filename.indexOf("."));
-        String outfile = file_root + "canonical.rxn";
+        String outfileName = file_root + outPrefix + "canonical.rxn";
+        File outfile = new File(outfileName);
+        outfile.createNewFile();
         FileWriter writer = new FileWriter(outfile); 
         MDLRXNWriter rxnWriter = new MDLRXNWriter(writer);
         rxnWriter.write(canonReaction);
@@ -104,11 +108,21 @@ public class ReactionFileTest {
     }
     
     @Test
-    public void testRxnFileC() throws CDKException, IOException {
+    public void testRxnFileCWithCharges() throws CDKException, IOException {
         String filename = "data/TestPOX.rxn";
 //        testFile(filename);
-        
-        writeCanonicalRxnFile(filename);
+        ICanonicalReactionLabeller reactionLabeller =
+            new ChargedSignatureReactionCanoniser();
+        writeCanonicalRxnFile(filename, "CHARGED", reactionLabeller);
+    }
+    
+    @Test
+    public void testRxnFileCNoCharges() throws CDKException, IOException {
+        String filename = "data/TestPOX.rxn";
+//        testFile(filename);
+        ICanonicalReactionLabeller reactionLabeller =
+            new SignatureReactionCanoniser();
+        writeCanonicalRxnFile(filename, "UNCHARGED", reactionLabeller);
     }
 
 }
